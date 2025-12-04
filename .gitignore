@@ -10,3 +10,7 @@ go.work.sum
 .env
 
 .vscode/
+
+*_test.go
+
+testdata
