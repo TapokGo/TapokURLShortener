@@ -75,7 +75,7 @@ func validateSettings(cfg *Config) error {
 
 // Set env config if exists
 func applyEnvOverrides(cfg *Config) {
-	// Add loging after parsing port and timeout if values incorrect
+	// Add logging after parsing port and timeout if values incorrect
 	if env := os.Getenv("URL_SHORTENER_ENV"); env != "" {
 		cfg.Env = env
 	}

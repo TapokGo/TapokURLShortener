@@ -1,0 +1,63 @@
+version: "2"
+
+run:
+  timeout: "5m"
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck 
+    - govet 
+    - ineffassign
+    - staticcheck
+    - unused
+    - revive
+    - gosec
+    - bodyclose
+    - dupl
+    - prealloc
+    - unconvert
+    - wastedassign
+    - tparallel
+  
+  disable:
+    - gocyclo
+    - funlen
+    - goconst
+
+  settings:
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: exported
+        - name: if-return
+        - name: increment-decrement
+        - name: var-naming
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: indent-error-flow
+        - name: unreachable-code
+    
+    gosec:
+      excludes:
+        - G104
+        - G115
+
+    errcheck:
+      exclude-functions:
+        - fmt:.*
+        - log/slog:.*
+        - (github.com/.../logger).Logger.*
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+
