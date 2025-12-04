@@ -46,11 +46,14 @@ func (a *App) Run() error {
 // Close logs file
 func (a *App) Close() error {
 	if a.logFile != nil {
-		return a.logFile.Close()
+		err := a.logFile.Close()
+		a.logFile = nil
+		return err
 	}
 	return nil
 }
 
+// TODO:extract into a separate package in yhe future perhaps
 // Init logger
 func initLogger(cfg *config.Config) (*slog.Logger, *os.File, error) {
 	var handler slog.Handler
