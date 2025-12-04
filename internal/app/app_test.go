@@ -35,7 +35,13 @@ func TestInitApp(t *testing.T) {
 
 func TestInitApp_CloseFile(t *testing.T) {
 	t.Setenv("URL_SHORTENER_ENV", "prod")
-	t.Setenv("URL_SHORTENER_LOG_PATH", "./testdata/app.log")
+
+	// Create temp file for logs
+	tmpFile, err := os.CreateTemp("", "test-app-*.log")
+	require.NoError(t, err)
+	defer os.Remove(tmpFile.Name())
+
+	t.Setenv("URL_SHORTENER_LOG_PATH", tmpFile.Name())
 
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
