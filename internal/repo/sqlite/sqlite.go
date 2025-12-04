@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Storage struct {
