@@ -15,7 +15,10 @@ func TestInitApp(t *testing.T) {
 	// Create temp file for logs
 	tmpFile, err := os.CreateTemp("", "test-app-*.log")
 	require.NoError(t, err)
-	defer os.Remove(tmpFile.Name())
+	defer func() {
+		_ = os.Remove(tmpFile.Name())
+	}()
+
 
 	t.Setenv("URL_SHORTENER_LOG_PATH", tmpFile.Name())
 
@@ -39,7 +42,9 @@ func TestInitApp_CloseFile(t *testing.T) {
 	// Create temp file for logs
 	tmpFile, err := os.CreateTemp("", "test-app-*.log")
 	require.NoError(t, err)
-	defer os.Remove(tmpFile.Name())
+	defer func() {
+		_ = os.Remove(tmpFile.Name())
+	}()
 
 	t.Setenv("URL_SHORTENER_LOG_PATH", tmpFile.Name())
 

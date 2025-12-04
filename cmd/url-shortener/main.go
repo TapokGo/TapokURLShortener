@@ -1,3 +1,4 @@
+// Main package of url-shortener application
 package main
 
 import (
@@ -10,12 +11,12 @@ import (
 
 func main() {
 	// Get path to config file
-	var config_path string
-	flag.StringVar(&config_path, "config", "./dev.yaml", "Path to the config file")
+	var configPath string
+	flag.StringVar(&configPath, "config", "./dev.yaml", "Path to the config file")
 	flag.Parse()
 
 	// Loads the application config
-	cfg, err := config.LoadConfig(config_path)
+	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
@@ -25,7 +26,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to init app: %v", err)
 	}
-	defer app.Close()
+	defer func() {
+		err := app.Close()
+		if err != nil {
+			app.Logger.Error("failed to close app dependencies", "error", err)
+		}
+	}()
 
 	// Start app
 	if err := app.Run(); err != nil {
