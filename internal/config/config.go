@@ -13,8 +13,8 @@ import (
 type Config struct {
 	Env         string `yaml:"env"`
 	StoragePath string `yaml:"storage_path"`
-
-	HTTPServer struct {
+	LogPath     string `yaml:"log_path"`
+	HTTPServer  struct {
 		Address     string        `yaml:"address"`
 		Port        int           `yaml:"port"`
 		Timeout     time.Duration `yaml:"timeout"`
@@ -48,6 +48,8 @@ func LoadConfig(path string) (Config, error) {
 func setDefaults(cfg *Config) {
 	cfg.Env = "dev"
 	cfg.StoragePath = "./storage/storage.db"
+	cfg.Env = "./app.log"
+
 	cfg.HTTPServer.Address = "localhost"
 	cfg.HTTPServer.Port = 8080
 	cfg.HTTPServer.Timeout, _ = time.ParseDuration("4s")
@@ -80,6 +82,10 @@ func applyEnvOverrides(cfg *Config) {
 
 	if storagePath := os.Getenv("URL_SHORTENER_STORAGE_PATH"); storagePath != "" {
 		cfg.StoragePath = storagePath
+	}
+
+	if logPath := os.Getenv("URL_SHORTENER_LOG_PATH"); logPath != "" {
+		cfg.LogPath = logPath
 	}
 
 	if address := os.Getenv("URL_SHORTENER_ADDRESS"); address != "" {
