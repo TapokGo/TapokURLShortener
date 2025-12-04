@@ -1,12 +1,44 @@
-PROJECT_NAME := url-shortener
+.DEFAULT_GOAL := help
+PROJECT_NAME := url_shortener
+BIN_DIR := bin
 
-.PHONY: fmt tidy run build test all
-run:
-	@echo "Running $(PROJECT_NAME)..."
-	@go run ./cmd/url-shortener --config "./local.yaml"
+.PHONY: test lint build run clean help
 
-fmt:
-	@go fmt ./...
+lint:
+	@echo "--------------------------------"
+	@echo "Starting linters..."
+	@golangci-lint run
 
-tidy:
-	@go mod tidy
+test: 
+	@echo "--------------------------------"
+	@echo "Starting tests..."
+	@go test -v ./...
+	@echo "Tests complete"
+
+build: lint test
+	@echo "--------------------------------"
+	@echo "Building $(PROJECT_NAME)..."
+	@go build -o ./$(BIN_DIR)/$(PROJECT_NAME) ./cmd/$(PROJECT_NAME)
+	@echo "Build complete: $(BIN_DIR)/$(PROJECT_NAME)"
+
+run: build	
+	@echo "--------------------------------"
+	@echo "Starting project..."
+	@./$(BIN_DIR)/$(PROJECT_NAME)
+
+clean:
+	@echo "--------------------------------"
+	@echo "Cleaning up..."
+	@rm -rf ./$(BIN_DIR)
+	@echo "Cleanup complete."
+	
+help:
+	@echo "Available commands:"
+	@echo "		make lint		- runs linters check"
+	@echo "		make test		- runs all go test"
+	@echo "		make build		- compiles the Go application(also start lint and tests)"
+	@echo "		make run		- build and run application"
+	@echo "		make clean		- removes complied binaries and other generated files"
+	@echo "		make help		- display this help message"
+
+
