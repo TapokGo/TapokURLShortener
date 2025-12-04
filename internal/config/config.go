@@ -1,15 +1,17 @@
+// Package config provides utilities for getting application settings
 package config
 
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
 	"gopkg.in/yaml.v3"
 )
 
-// Model of the application config
+// Config is a model of application config
 type Config struct {
 	Env         string `yaml:"env"`
 	StoragePath string `yaml:"storage_path"`
@@ -22,7 +24,7 @@ type Config struct {
 	} `yaml:"http_server"`
 }
 
-// Loads config from YAML with overrides from env.
+// LoadConfig loads config from YAML with overrides from env.
 // Gets the path to the YAMl config, return Config{} and error
 func LoadConfig(path string) (Config, error) {
 	var cfg Config
@@ -75,7 +77,7 @@ func validateSettings(cfg *Config) error {
 
 // Set env config if exists
 func applyEnvOverrides(cfg *Config) {
-	// Add loging after parsing port and timeout if values incorrect
+	// Add logging after parsing port and timeout if values incorrect
 	if env := os.Getenv("URL_SHORTENER_ENV"); env != "" {
 		cfg.Env = env
 	}
@@ -115,7 +117,8 @@ func applyEnvOverrides(cfg *Config) {
 }
 
 func loadFromYAML(path string, cfg *Config) error {
-	yamlFile, err := os.ReadFile(path)
+	filePath := filepath.Clean(path)
+	yamlFile, err := os.ReadFile(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to read config file %q: %w", path, err)
 	}
