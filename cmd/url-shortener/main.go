@@ -16,7 +16,7 @@ func init() {
 func main() {
 	// Get path to config file
 	var config_path string
-	flag.StringVar(&config_path, "config", "./local.yaml", "Path to config file")
+	flag.StringVar(&config_path, "config", "./dev.yaml", "Path to the config file")
 	flag.Parse()
 
 	cfg, err := config.LoadConfig(config_path)

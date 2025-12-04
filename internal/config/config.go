@@ -9,8 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// TODO: make test for LoadConfig
-
+// Model of the application config
 type Config struct {
 	Env         string `yaml:"env"`
 	StoragePath string `yaml:"storage_path"`
@@ -23,6 +22,8 @@ type Config struct {
 	} `yaml:"http_server"`
 }
 
+// Loads config from YAML with overrides from env.
+// Gets the path to the YAMl config, return Config{} and error
 func LoadConfig(path string) (Config, error) {
 	var cfg Config
 
