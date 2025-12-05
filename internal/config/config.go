@@ -26,24 +26,24 @@ type Config struct {
 
 // LoadConfig loads config from YAML with overrides from env.
 // Gets the path to the YAMl config, return Config{} and error
-func LoadConfig(path string) (Config, error) {
+func LoadConfig(path string) (*Config, error) {
 	var cfg Config
 
 	setDefaults(&cfg)
 
 	if path != "" {
 		if err := loadFromYAML(path, &cfg); err != nil {
-			return Config{}, err
+			return nil, err
 		}
 	}
 
 	applyEnvOverrides(&cfg)
 
 	if err := validateSettings(&cfg); err != nil {
-		return Config{}, err
+		return nil, err
 	}
 
-	return cfg, nil
+	return &cfg, nil
 }
 
 // Set default settings

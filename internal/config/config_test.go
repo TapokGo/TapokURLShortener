@@ -39,7 +39,7 @@ func TestLoadConfig_InvalidPort(t *testing.T) {
 	require.Error(t, err)
 
 	assert.Contains(t, err.Error(), "invalid port")
-	assert.Equal(t, Config{}, cfg)
+	assert.Nil(t, cfg)
 }
 
 func TestLoadConfig_InvalidENV(t *testing.T) {
@@ -49,7 +49,7 @@ func TestLoadConfig_InvalidENV(t *testing.T) {
 	require.Error(t, err)
 
 	assert.Contains(t, err.Error(), "invalid env")
-	assert.Equal(t, Config{}, cfg)
+	assert.Nil(t, cfg)
 }
 
 func TestLoadConfig_FileNotFound(t *testing.T) {
@@ -58,5 +58,5 @@ func TestLoadConfig_FileNotFound(t *testing.T) {
 	require.Error(t, err)
 
 	assert.Contains(t, err.Error(), "failed to read config")
-	assert.Equal(t, Config{}, cfg)
+	assert.Nil(t, cfg)
 }

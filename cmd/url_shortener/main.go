@@ -22,7 +22,7 @@ func main() {
 	}
 
 	// Init app
-	app, err := app.New(cfg)
+	app, err := app.New(*cfg)
 	if err != nil {
 		log.Fatalf("failed to init app: %v", err)
 	}
