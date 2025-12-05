@@ -2,6 +2,7 @@ package app
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
@@ -24,6 +25,10 @@ func TestInitApp(t *testing.T) {
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
 	require.NotNil(t, cfg)
+
+
+	tmpDir := t.TempDir()
+	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
 
 	app, err := New(*cfg)
 	require.NoError(t, err)
@@ -51,6 +56,9 @@ func TestInitApp_CloseFile(t *testing.T) {
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
 
+	tmpDir := t.TempDir()
+	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
+
 	app, err := New(*cfg)
 	require.NoError(t, err)
 	require.NotNil(t, app)
@@ -63,6 +71,9 @@ func TestInitApp_CloseFile(t *testing.T) {
 func TestIniApp_DevMode(t *testing.T) {
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
+
+	tmpDir := t.TempDir()
+	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
 
 	app, err := New(*cfg)
 	require.NoError(t, err)
