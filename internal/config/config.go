@@ -50,7 +50,7 @@ func LoadConfig(path string) (*Config, error) {
 func setDefaults(cfg *Config) {
 	cfg.Env = "dev"
 	cfg.StoragePath = "./storage/storage.db"
-	cfg.Env = "./app.log"
+	cfg.LogPath = "./app.log"
 
 	cfg.HTTPServer.Address = "localhost"
 	cfg.HTTPServer.Port = 8080
