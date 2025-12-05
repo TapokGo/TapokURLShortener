@@ -19,19 +19,19 @@ func TestInitApp(t *testing.T) {
 		_ = os.Remove(tmpFile.Name())
 	}()
 
-
 	t.Setenv("URL_SHORTENER_LOG_PATH", tmpFile.Name())
 
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
+	require.NotNil(t, cfg)
 
-	app, err := New(cfg)
+	app, err := New(*cfg)
 	require.NoError(t, err)
 	require.NotNil(t, app)
 
 	assert.NotNil(t, app.Logger)
 	assert.NotNil(t, app.logFile)
-	assert.Equal(t, cfg, app.Cfg)
+	assert.Equal(t, *cfg, app.Cfg)
 
 	assert.Equal(t, cfg.LogPath, app.logFile.Name())
 }
@@ -51,7 +51,7 @@ func TestInitApp_CloseFile(t *testing.T) {
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
 
-	app, err := New(cfg)
+	app, err := New(*cfg)
 	require.NoError(t, err)
 	require.NotNil(t, app)
 
@@ -64,7 +64,7 @@ func TestIniApp_DevMode(t *testing.T) {
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
 
-	app, err := New(cfg)
+	app, err := New(*cfg)
 	require.NoError(t, err)
 	require.NotNil(t, app)
 
