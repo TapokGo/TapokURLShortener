@@ -2,39 +2,137 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/Tapok-Go/TestURLShortener/internal/repo"
+	_ "modernc.org/sqlite"
 )
 
-type Storage struct {
-	db *sql.DB
+// TODO: Rewtire with global errors
+var ()
+
+type storage struct {
+	db       *sql.DB
+	saveStmt *sql.Stmt
+	getStmt  *sql.Stmt
 }
 
 // Init the db instance
-func New(cfg *config.Config) (*Storage, error) {
-	db, err := sql.Open("sqlite3", cfg.StoragePath)
+func New(cfg *config.Config) (repo.URLStorage, error) {
+	db, err := sql.Open("sqlite", cfg.StoragePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open db instance: %w", err)
+		return nil, fmt.Errorf("failed to open db: %w", err)
 	}
 
-	return &Storage{
-		db: db,
-	}, nil
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping db: %w", err)
+	}
+
+	saveStmt, getStmt, err := createStmts(db)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create staitments: %w", err)
+	}
+
+	s := &storage{
+		db:       db,
+		saveStmt: saveStmt,
+		getStmt:  getStmt,
+	}
+
+	if err = s.initSchema(); err != nil {
+		return nil, fmt.Errorf("failed to init schema: %w", err)
+	}
+
+	return s, nil
 }
 
-// Save URL to db
-func (s *Storage) SaveURL(temp string) error {
+// Save function save URL to db
+func (s *storage) Save(short, origin string) error {
+	// TODO: add check existence of short URL
+	_, err := s.saveStmt.Exec(short, origin)
+	if err != nil {
+		return fmt.Errorf("failed to save pair URL to db: %w", err)
+	}
+
 	return nil
+}
+
+// Get function get original URL by short
+func (s *storage) Get(short string) (string, error) {
+	var originUrl string
+	err := s.getStmt.QueryRow(short).Scan(&originUrl)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", fmt.Errorf("result not found: %w", err)
+		}
+		return "", fmt.Errorf("failed to save pair URL to db: %w", err)
+	}
+
+	return originUrl, nil
 }
 
 // Close db instance
-func (s *Storage) Close() error {
-	err := s.db.Close()
+func (s *storage) Close() error {
+	err := s.saveStmt.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close db instance")
+		return fmt.Errorf("failed to close save staitment: %w", err)
 	}
-	
+
+	err = s.getStmt.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close get staitment: %w", err)
+	}
+
+	err = s.db.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close db instance: %w", err)
+	}
+
 	return nil
+}
+
+func (s *storage) initSchema() error {
+	q := `
+	CREATE TABLE IF NOT EXISTS urls (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		short_url TEXT NOT NULL,
+		origin_url TEXT NOT NULL
+	)
+	`
+
+	if _, err := s.db.Exec(q); err != nil {
+		return fmt.Errorf("failed to create shema: %w", err)
+	}
+
+	return nil
+}
+
+func createStmts(db *sql.DB) (save *sql.Stmt, get *sql.Stmt, err error) {
+	saveQuery := `
+		INSERT INTO urls (
+			short_url, 
+			origin_url
+		) VALUES (
+			?, ?
+		)
+	`
+	getQuery := `
+		SELECT 
+			origin_url FROM urls
+		WHERE short_url = ? 
+	`
+
+	saveStmt, err := db.Prepare(saveQuery)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create save statements: %w", err)
+	}
+
+	getStmt, err := db.Prepare(getQuery)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create get statements: %w", err)
+	}
+
+	return saveStmt, getStmt, nil
 }
