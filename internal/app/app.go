@@ -3,23 +3,25 @@ package app
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
+	"github.com/Tapok-Go/TestURLShortener/internal/logger"
+	"github.com/Tapok-Go/TestURLShortener/internal/logger/slog"
+
 )
 
 // App is a model of application dependencies
 type App struct {
 	Cfg     config.Config
-	Logger  *slog.Logger
+	Logger  logger.Logger
 	logFile *os.File
 }
 
 // New function allows init all dependencies.
 // Get the config.Config struct, return App struct and error
 func New(cfg config.Config) (*App, error) {
-	logger, logFile, err := initLogger(&cfg)
+	logger, logFile, err := slog.NewSlogLogger(&cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init logger: %w", err)
 	}
@@ -47,6 +49,7 @@ func (a *App) Run() error {
 	//TODO: start server
 }
 
+// TODO: refactor to correct closing all dependecies
 // Close function allows close all dependencies.
 // Return error
 func (a *App) Close() error {
@@ -56,29 +59,4 @@ func (a *App) Close() error {
 		return err
 	}
 	return nil
-}
-
-// TODO:extract into a separate package in yhe future perhaps
-func initLogger(cfg *config.Config) (*slog.Logger, *os.File, error) {
-	var handler slog.Handler
-	var logFile *os.File
-
-	if cfg.Env == "dev" {
-		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelDebug,
-		})
-	} else {
-		file, err := os.OpenFile(cfg.LogPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to open log file: %w", err)
-		}
-		logFile = file
-
-		handler = slog.NewJSONHandler(logFile, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
-		})
-	}
-
-	logger := slog.New(handler)
-	return logger, logFile, nil
 }
