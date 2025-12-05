@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
 	"github.com/Tapok-Go/TestURLShortener/internal/repo"
@@ -22,6 +24,12 @@ type storage struct {
 
 // New init the db instance
 func New(cfg *config.Config) (repo.URLStorage, error) {
+	// Check a dir is exists
+	dbDir := filepath.Dir(cfg.StoragePath)
+	if err := os.MkdirAll(dbDir, 0750); err != nil {
+		return nil, fmt.Errorf("failed to create db dir %q: %w", dbDir, err)
+	}
+
 	db, err := sql.Open("sqlite", cfg.StoragePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open db: %w", err)
