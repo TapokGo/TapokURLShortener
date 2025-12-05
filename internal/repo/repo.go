@@ -1,7 +1,8 @@
+// Package repo temp
 package repo
 
 // URLStorage is an interface that provides a SaveURL method
-// allowwig saves a URL to the db
+// allowing saves a URL to the db
 type URLStorage interface {
 	// Save function save pair URL (short, original).
 	// Must return err if:
@@ -9,7 +10,7 @@ type URLStorage interface {
 	// - error from db
 	Save(short, original string) error
 
-	// Get function return original URL byshort URL
+	// Get function return original URL by short URL
 	// Must return:
 	// - (url, nil) - if record already exists
 	// - ("", ErrNotFound) - if not found

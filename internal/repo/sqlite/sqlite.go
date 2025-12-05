@@ -1,3 +1,4 @@
+// Package sqlite temp
 package sqlite
 
 import (
@@ -7,10 +8,10 @@ import (
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
 	"github.com/Tapok-Go/TestURLShortener/internal/repo"
-	_ "modernc.org/sqlite"
+	_ "modernc.org/sqlite" // Register sqlite driver
 )
 
-// TODO: Rewtire with global errors
+// TODO: Rewrite with global errors
 var ()
 
 type storage struct {
@@ -19,7 +20,7 @@ type storage struct {
 	getStmt  *sql.Stmt
 }
 
-// Init the db instance
+// New init the db instance
 func New(cfg *config.Config) (repo.URLStorage, error) {
 	db, err := sql.Open("sqlite", cfg.StoragePath)
 	if err != nil {
@@ -32,7 +33,7 @@ func New(cfg *config.Config) (repo.URLStorage, error) {
 
 	saveStmt, getStmt, err := createStmts(db)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create staitments: %w", err)
+		return nil, fmt.Errorf("failed to create statements: %w", err)
 	}
 
 	s := &storage{
@@ -61,8 +62,8 @@ func (s *storage) Save(short, origin string) error {
 
 // Get function get original URL by short
 func (s *storage) Get(short string) (string, error) {
-	var originUrl string
-	err := s.getStmt.QueryRow(short).Scan(&originUrl)
+	var originURL string
+	err := s.getStmt.QueryRow(short).Scan(&originURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", fmt.Errorf("result not found: %w", err)
@@ -70,19 +71,19 @@ func (s *storage) Get(short string) (string, error) {
 		return "", fmt.Errorf("failed to save pair URL to db: %w", err)
 	}
 
-	return originUrl, nil
+	return originURL, nil
 }
 
 // Close db instance
 func (s *storage) Close() error {
 	err := s.saveStmt.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close save staitment: %w", err)
+		return fmt.Errorf("failed to close save statement: %w", err)
 	}
 
 	err = s.getStmt.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close get staitment: %w", err)
+		return fmt.Errorf("failed to close get statement: %w", err)
 	}
 
 	err = s.db.Close()
@@ -103,7 +104,7 @@ func (s *storage) initSchema() error {
 	`
 
 	if _, err := s.db.Exec(q); err != nil {
-		return fmt.Errorf("failed to create shema: %w", err)
+		return fmt.Errorf("failed to create schema: %w", err)
 	}
 
 	return nil

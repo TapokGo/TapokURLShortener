@@ -14,6 +14,7 @@ import (
 )
 
 // TODO: add documentation in all packages
+
 // App is a model of application dependencies
 type App struct {
 	Cfg        config.Config

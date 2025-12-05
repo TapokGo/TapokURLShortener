@@ -24,7 +24,6 @@ type Config struct {
 	} `yaml:"http_server"`
 }
 
-// TODO: remove returning Config{}
 // Loads config from YAML with overrides from env.
 // Gets the path to the YAMl config, return Config{} and error
 func LoadConfig(path string) (*Config, error) {
