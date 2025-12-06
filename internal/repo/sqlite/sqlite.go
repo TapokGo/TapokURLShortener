@@ -13,8 +13,10 @@ import (
 	_ "modernc.org/sqlite" // Register sqlite driver
 )
 
-// TODO: Rewrite with global errors
-var ()
+var (
+	ErrNotFound  = errors.New("URL not found")
+	ErrDuplicate = errors.New("URL already exists")
+)
 
 type storage struct {
 	db       *sql.DB
@@ -59,10 +61,18 @@ func New(cfg *config.Config) (repo.URLStorage, error) {
 
 // Save function save URL to db
 func (s *storage) Save(short, origin string) error {
-	// TODO: add check existence of short URL
-	_, err := s.saveStmt.Exec(short, origin)
+	res, err := s.saveStmt.Exec(short, origin)
 	if err != nil {
 		return fmt.Errorf("failed to save pair URL to db: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrDuplicate
 	}
 
 	return nil
@@ -74,7 +84,7 @@ func (s *storage) Get(short string) (string, error) {
 	err := s.getStmt.QueryRow(short).Scan(&originURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return "", fmt.Errorf("result not found: %w", err)
+			return "", ErrNotFound
 		}
 		return "", fmt.Errorf("failed to save pair URL to db: %w", err)
 	}
@@ -84,22 +94,23 @@ func (s *storage) Get(short string) (string, error) {
 
 // Close db instance
 func (s *storage) Close() error {
+	closeErrors := make([]error, 0, 3)
 	err := s.saveStmt.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close save statement: %w", err)
+		closeErrors = append(closeErrors, fmt.Errorf("failed to close save statement: %w", err))
 	}
 
 	err = s.getStmt.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close get statement: %w", err)
+		closeErrors = append(closeErrors, fmt.Errorf("failed to close get statement: %w", err))
 	}
 
 	err = s.db.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close db instance: %w", err)
+		closeErrors = append(closeErrors, fmt.Errorf("failed to close db instance: %w", err))
 	}
 
-	return nil
+	return errors.Join(closeErrors...)
 }
 
 func (s *storage) initSchema() error {
@@ -107,7 +118,7 @@ func (s *storage) initSchema() error {
 	CREATE TABLE IF NOT EXISTS urls (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		short_url TEXT NOT NULL,
-		origin_url TEXT NOT NULL
+		origin_url TEXT NOT NULL 
 	)
 	`
 
@@ -120,7 +131,7 @@ func (s *storage) initSchema() error {
 
 func createStmts(db *sql.DB) (save *sql.Stmt, get *sql.Stmt, err error) {
 	saveQuery := `
-		INSERT INTO urls (
+		INSERT OR IGNORE INTO urls (
 			short_url, 
 			origin_url
 		) VALUES (
