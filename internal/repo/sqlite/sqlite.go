@@ -13,8 +13,10 @@ import (
 	_ "modernc.org/sqlite" // Register sqlite driver
 )
 
-// TODO: Rewrite with global errors
-var ()
+var (
+	ErrNotFound  = errors.New("URL not found")
+	ErrDuplicate = errors.New("URL already exists")
+)
 
 type storage struct {
 	db       *sql.DB
@@ -74,7 +76,7 @@ func (s *storage) Get(short string) (string, error) {
 	err := s.getStmt.QueryRow(short).Scan(&originURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return "", fmt.Errorf("result not found: %w", err)
+			return "", ErrNotFound
 		}
 		return "", fmt.Errorf("failed to save pair URL to db: %w", err)
 	}
