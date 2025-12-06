@@ -25,7 +25,7 @@ type App struct {
 
 // New allows init all dependencies
 func New(cfg config.Config) (*App, error) {
-	logger, logFile, err := slog.NewSlogLogger(&cfg)
+	logger, logFile, err := slog.New(&cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init logger: %w", err)
 	}
