@@ -61,10 +61,18 @@ func New(cfg *config.Config) (repo.URLStorage, error) {
 
 // Save function save URL to db
 func (s *storage) Save(short, origin string) error {
-	// TODO: add check existence of short URL
-	_, err := s.saveStmt.Exec(short, origin)
+	res, err := s.saveStmt.Exec(short, origin)
 	if err != nil {
 		return fmt.Errorf("failed to save pair URL to db: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrDuplicate
 	}
 
 	return nil
@@ -110,7 +118,7 @@ func (s *storage) initSchema() error {
 	CREATE TABLE IF NOT EXISTS urls (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		short_url TEXT NOT NULL,
-		origin_url TEXT NOT NULL
+		origin_url TEXT NOT NULL 
 	)
 	`
 
@@ -123,7 +131,7 @@ func (s *storage) initSchema() error {
 
 func createStmts(db *sql.DB) (save *sql.Stmt, get *sql.Stmt, err error) {
 	saveQuery := `
-		INSERT INTO urls (
+		INSERT OR IGNORE INTO urls (
 			short_url, 
 			origin_url
 		) VALUES (
