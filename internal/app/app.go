@@ -2,9 +2,9 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"os"
-	"errors"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
 	"github.com/Tapok-Go/TestURLShortener/internal/logger"
@@ -14,19 +14,16 @@ import (
 	"github.com/Tapok-Go/TestURLShortener/internal/service"
 )
 
-// TODO: add documentation in all packages
-
 // App is a model of application dependencies
 type App struct {
-	Cfg        config.Config
+	cfg        config.Config
 	Logger     logger.Logger
 	logFile    *os.File
-	URLService *service.URLService
+	urlService *service.URLService
 	repo       repo.URLStorage
 }
 
-// New function allows init all dependencies.
-// Get the config.Config struct, return App struct and error
+// New allows init all dependencies
 func New(cfg config.Config) (*App, error) {
 	logger, logFile, err := slog.NewSlogLogger(&cfg)
 	if err != nil {
@@ -45,29 +42,26 @@ func New(cfg config.Config) (*App, error) {
 	//TODO: init router - chi, chi-render
 
 	return &App{
-		Cfg:        cfg,
+		cfg:        cfg,
 		Logger:     logger,
 		logFile:    logFile,
-		URLService: urlService,
+		urlService: urlService,
 		repo:       repo,
 	}, nil
 }
 
-// Run function allows start all program.
-// Return error
+// Run allows start all program
 func (a *App) Run() error {
-	a.Logger.Info("Application started", "env", a.Cfg.Env)
+	a.Logger.Info("Application started", "env", a.cfg.Env)
 
-	fmt.Println(a.Cfg)
+	fmt.Println(a.cfg)
 
 	return nil
 
 	//TODO: start server
 }
 
-// TODO: refactor to correct closing all dependecies
-// Close function allows close all dependencies.
-// Return error
+// Close allows close all dependencies.
 func (a *App) Close() error {
 	closeErrros := make([]error, 0, 2)
 	// Close logger

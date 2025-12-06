@@ -39,7 +39,7 @@ func TestInitApp(t *testing.T) {
 
 	assert.NotNil(t, app.Logger)
 	assert.NotNil(t, app.logFile)
-	assert.Equal(t, *cfg, app.Cfg)
+	assert.Equal(t, *cfg, app.cfg)
 
 	assert.Equal(t, cfg.LogPath, app.logFile.Name())
 }
