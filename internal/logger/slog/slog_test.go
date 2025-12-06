@@ -53,7 +53,7 @@ func newProdLogger(t *testing.T) (logger logInterface.Logger, readFileFunc func(
 	cfg, err := config.LoadConfig("")
 	require.NoError(t, err)
 
-	logger, logFile, err := NewSlogLogger(cfg)
+	logger, logFile, err := New(cfg)
 	assert.NotNil(t, logFile)
 
 	return logger,

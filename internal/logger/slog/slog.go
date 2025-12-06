@@ -14,7 +14,7 @@ type slogLogger struct {
 	logger *slog.Logger
 }
 
-func NewSlogLogger(cfg *config.Config) (logger.Logger, *os.File, error) {
+func New(cfg *config.Config) (logger.Logger, *os.File, error) {
 	var handler slog.Handler
 	var logFile *os.File
 
