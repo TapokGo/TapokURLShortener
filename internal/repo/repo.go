@@ -1,4 +1,4 @@
-// Package repo temp
+// Package repo provides an interface for work with the repository
 package repo
 
 import "errors"
