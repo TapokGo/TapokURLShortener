@@ -1,4 +1,4 @@
-// Package sqlite temp
+// Package sqlite provides a DQLite-based implementation of the repo.URLStorage interface
 package sqlite
 
 import (
@@ -13,18 +13,13 @@ import (
 	_ "modernc.org/sqlite" // Register sqlite driver
 )
 
-var (
-	ErrNotFound  = errors.New("URL not found")
-	ErrDuplicate = errors.New("URL already exists")
-)
-
 type storage struct {
 	db       *sql.DB
 	saveStmt *sql.Stmt
 	getStmt  *sql.Stmt
 }
 
-// New init the db instance
+// New creates a new repo.URLStorage conn using SQLite
 func New(cfg *config.Config) (repo.URLStorage, error) {
 	// Check a dir is exists
 	dbDir := filepath.Dir(cfg.StoragePath)
@@ -41,6 +36,7 @@ func New(cfg *config.Config) (repo.URLStorage, error) {
 		return nil, fmt.Errorf("failed to ping db: %w", err)
 	}
 
+	// Create save and get statememts
 	saveStmt, getStmt, err := createStmts(db)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create statements: %w", err)
@@ -52,6 +48,7 @@ func New(cfg *config.Config) (repo.URLStorage, error) {
 		getStmt:  getStmt,
 	}
 
+	// Create schema
 	if err = s.initSchema(); err != nil {
 		return nil, fmt.Errorf("failed to init schema: %w", err)
 	}
@@ -59,7 +56,7 @@ func New(cfg *config.Config) (repo.URLStorage, error) {
 	return s, nil
 }
 
-// Save function save URL to db
+// Save saving url pair into db
 func (s *storage) Save(short, origin string) error {
 	res, err := s.saveStmt.Exec(short, origin)
 	if err != nil {
@@ -72,27 +69,27 @@ func (s *storage) Save(short, origin string) error {
 	}
 
 	if rows == 0 {
-		return ErrDuplicate
+		return repo.ErrDuplicate
 	}
 
 	return nil
 }
 
-// Get function get original URL by short
+// Get get original URL by short
 func (s *storage) Get(short string) (string, error) {
 	var originURL string
 	err := s.getStmt.QueryRow(short).Scan(&originURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return "", ErrNotFound
+			return "", repo.ErrNotFound
 		}
-		return "", fmt.Errorf("failed to save pair URL to db: %w", err)
+		return "", fmt.Errorf("failed to get URL to db: %w", err)
 	}
 
 	return originURL, nil
 }
 
-// Close db instance
+// Close db resource (conn and statements)
 func (s *storage) Close() error {
 	closeErrors := make([]error, 0, 3)
 	err := s.saveStmt.Close()
