@@ -84,22 +84,23 @@ func (s *storage) Get(short string) (string, error) {
 
 // Close db instance
 func (s *storage) Close() error {
+	closeErrors := make([]error, 0, 3)
 	err := s.saveStmt.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close save statement: %w", err)
+		closeErrors = append(closeErrors, fmt.Errorf("failed to close save statement: %w", err))
 	}
 
 	err = s.getStmt.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close get statement: %w", err)
+		closeErrors = append(closeErrors, fmt.Errorf("failed to close get statement: %w", err))
 	}
 
 	err = s.db.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close db instance: %w", err)
+		closeErrors = append(closeErrors, fmt.Errorf("failed to close db instance: %w", err))
 	}
 
-	return nil
+	return errors.Join(closeErrors...)
 }
 
 func (s *storage) initSchema() error {
