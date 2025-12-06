@@ -31,7 +31,7 @@ func New(cfg config.Config) (*App, error) {
 	}
 
 	// Storage
-	repo, err := sqlite.New(&cfg)
+	repo, err := sqlite.New(cfg.StoragePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init db: %w", err)
 	}
