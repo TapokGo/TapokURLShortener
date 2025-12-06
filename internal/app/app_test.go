@@ -2,6 +2,7 @@ package app
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
@@ -25,9 +26,16 @@ func TestInitApp(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, cfg)
 
+	tmpDir := t.TempDir()
+	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
+
 	app, err := New(*cfg)
 	require.NoError(t, err)
 	require.NotNil(t, app)
+
+	defer func() {
+		require.NoError(t, app.Close())
+	}()
 
 	assert.NotNil(t, app.Logger)
 	assert.NotNil(t, app.logFile)
@@ -51,9 +59,16 @@ func TestInitApp_CloseFile(t *testing.T) {
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
 
+	tmpDir := t.TempDir()
+	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
+
 	app, err := New(*cfg)
 	require.NoError(t, err)
 	require.NotNil(t, app)
+
+	defer func() {
+		require.NoError(t, app.Close())
+	}()
 
 	err = app.Close()
 	require.NoError(t, err)
@@ -64,9 +79,16 @@ func TestIniApp_DevMode(t *testing.T) {
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
 	require.NoError(t, err)
 
+	tmpDir := t.TempDir()
+	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
+
 	app, err := New(*cfg)
 	require.NoError(t, err)
 	require.NotNil(t, app)
+
+	defer func() {
+		require.NoError(t, app.Close())
+	}()
 
 	assert.Nil(t, app.logFile)
 	assert.NotNil(t, app.Logger)

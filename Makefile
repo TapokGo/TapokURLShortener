@@ -30,6 +30,7 @@ clean:
 	@echo "--------------------------------"
 	@echo "Cleaning up..."
 	@rm -rf ./$(BIN_DIR)
+	@rm -rf ./storage
 	@echo "Cleanup complete."
 	
 help:
