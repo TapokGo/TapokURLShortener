@@ -8,8 +8,7 @@ var (
 	ErrDuplicate = errors.New("URL already exists")
 )
 
-// URLStorage is an interface that provides a SaveURL method
-// allowing saves a URL to the db
+// URLStorage defines the contract for persistent URL mapping storage
 type URLStorage interface {
 	// Save function save pair URL (short, original).
 	// Must return err if:
