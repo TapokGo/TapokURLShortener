@@ -4,6 +4,7 @@ package app
 import (
 	"fmt"
 	"os"
+	"errors"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
 	"github.com/Tapok-Go/TestURLShortener/internal/logger"
@@ -68,18 +69,19 @@ func (a *App) Run() error {
 // Close function allows close all dependencies.
 // Return error
 func (a *App) Close() error {
+	closeErrros := make([]error, 0, 2)
 	// Close logger
 	if a.logFile != nil {
 		err := a.logFile.Close()
 		a.logFile = nil
-		return err
+		closeErrros = append(closeErrros, err)
 	}
 
 	// Close repo
 	if a.repo != nil {
 		err := a.repo.Close()
 		a.repo = nil
-		return err
+		closeErrros = append(closeErrros, err)
 	}
-	return nil
+	return errors.Join(closeErrros...)
 }
