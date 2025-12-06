@@ -1,12 +1,19 @@
 // Package repo temp
 package repo
 
+import "errors"
+
+var (
+	ErrNotFound  = errors.New("URL not found")
+	ErrDuplicate = errors.New("URL already exists")
+)
+
 // URLStorage is an interface that provides a SaveURL method
 // allowing saves a URL to the db
 type URLStorage interface {
 	// Save function save pair URL (short, original).
 	// Must return err if:
-	// - short already exists
+	// -  short already exists (ErrDuplicate)
 	// - error from db
 	Save(short, original string) error
 
