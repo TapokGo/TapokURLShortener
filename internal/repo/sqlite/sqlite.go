@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Tapok-Go/TestURLShortener/internal/config"
 	"github.com/Tapok-Go/TestURLShortener/internal/repo"
 	_ "modernc.org/sqlite" // Register sqlite driver
 )
@@ -20,14 +19,14 @@ type storage struct {
 }
 
 // New creates a new repo.URLStorage conn using SQLite
-func New(cfg *config.Config) (repo.URLStorage, error) {
+func New(path string) (repo.URLStorage, error) {
 	// Check a dir is exists
-	dbDir := filepath.Dir(cfg.StoragePath)
+	dbDir := filepath.Dir(path)
 	if err := os.MkdirAll(dbDir, 0750); err != nil {
 		return nil, fmt.Errorf("failed to create db dir %q: %w", dbDir, err)
 	}
 
-	db, err := sql.Open("sqlite", cfg.StoragePath)
+	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open db: %w", err)
 	}
