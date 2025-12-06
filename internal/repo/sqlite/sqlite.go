@@ -114,7 +114,7 @@ func (s *storage) initSchema() error {
 	q := `
 	CREATE TABLE IF NOT EXISTS urls (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		short_url TEXT NOT NULL,
+		short_url TEXT NOT NULL UNIQUE,
 		origin_url TEXT NOT NULL 
 	)
 	`
