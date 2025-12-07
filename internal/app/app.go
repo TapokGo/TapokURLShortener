@@ -62,19 +62,19 @@ func (a *App) Run() error {
 
 // Close close all dependencies
 func (a *App) Close() error {
-	closeErrros := make([]error, 0, 2)
+	closeErrors := make([]error, 0, 2)
 	// Close logger
 	if a.logFile != nil {
 		err := a.logFile.Close()
 		a.logFile = nil
-		closeErrros = append(closeErrros, err)
+		closeErrors = append(closeErrors, err)
 	}
 
 	// Close repo
 	if a.repo != nil {
 		err := a.repo.Close()
 		a.repo = nil
-		closeErrros = append(closeErrros, err)
+		closeErrors = append(closeErrors, err)
 	}
-	return errors.Join(closeErrros...)
+	return errors.Join(closeErrors...)
 }
