@@ -12,6 +12,7 @@ func TestLoadConfig_YAML(t *testing.T) {
 	t.Parallel()
 	cfg, err := LoadConfig("testdata/valid.yaml")
 	require.NoError(t, err)
+	require.NotNil(t, cfg)
 
 	assert.Equal(t, "dev", cfg.Env)
 	assert.Equal(t, "./storage/storage.db", cfg.StoragePath)
@@ -22,40 +23,42 @@ func TestLoadConfig_YAML(t *testing.T) {
 }
 
 func TestLoadConfig_OverrideENV(t *testing.T) {
-	t.Setenv("URL_SHORTENER_ADDRESS", "babai")
+	t.Setenv("URL_SHORTENER_ADDRESS", "test_url_address")
 	t.Setenv("URL_SHORTENER_PORT", "3000")
 
 	cfg, err := LoadConfig("testdata/valid.yaml")
+	require.NotNil(t, cfg)
 	require.NoError(t, err)
 
-	assert.Equal(t, "babai", cfg.HTTPServer.Address)
+	assert.Equal(t, "test_url_address", cfg.HTTPServer.Address)
 	assert.Equal(t, 3000, cfg.HTTPServer.Port)
 }
 
-func TestLoadConfig_InvalidPort(t *testing.T) {
-	t.Setenv("URL_SHORTENER_PORT", "0")
+func TestLoadConfig_InvalidData(t *testing.T) {
+	t.Run("Invalid port", func(t *testing.T) {
+		t.Setenv("URL_SHORTENER_PORT", "0")
 
-	cfg, err := LoadConfig("testdata/valid.yaml")
-	require.Error(t, err)
+		cfg, err := LoadConfig("testdata/valid.yaml")
+		require.Error(t, err)
+		require.Nil(t, cfg)
+		assert.Contains(t, err.Error(), "invalid port")
+	})
 
-	assert.Contains(t, err.Error(), "invalid port")
-	assert.Nil(t, cfg)
-}
+	t.Run("Invalid ENV", func(t *testing.T) {
+		t.Setenv("URL_SHORTENER_ENV", "stage")
 
-func TestLoadConfig_InvalidENV(t *testing.T) {
-	t.Setenv("URL_SHORTENER_ENV", "stage")
-
-	cfg, err := LoadConfig("testdata/valid.yaml")
-	require.Error(t, err)
-
-	assert.Contains(t, err.Error(), "invalid env")
-	assert.Nil(t, cfg)
+		cfg, err := LoadConfig("testdata/valid.yaml")
+		require.Error(t, err)
+		require.Nil(t, cfg)
+		assert.Contains(t, err.Error(), "invalid env")
+	})
 }
 
 func TestLoadConfig_FileNotFound(t *testing.T) {
 	t.Parallel()
 	cfg, err := LoadConfig("testdata/non_valid.yaml")
 	require.Error(t, err)
+	require.Nil(t, cfg)
 
 	assert.Contains(t, err.Error(), "failed to read config")
 	assert.Nil(t, cfg)
