@@ -24,8 +24,7 @@ type Config struct {
 	} `yaml:"http_server"`
 }
 
-// LoadConfig loads config from YAML with overrides from env.
-// Gets the path to the YAMl config, return Config{} and error
+// LoadConfig loads config from YAML with overrides from env
 func LoadConfig(path string) (*Config, error) {
 	var cfg Config
 
@@ -46,7 +45,6 @@ func LoadConfig(path string) (*Config, error) {
 	return &cfg, nil
 }
 
-// Set default settings
 func setDefaults(cfg *Config) {
 	cfg.Env = "dev"
 	cfg.StoragePath = "./storage/storage.db"
@@ -58,7 +56,6 @@ func setDefaults(cfg *Config) {
 	cfg.HTTPServer.IdleTimeout, _ = time.ParseDuration("60s")
 }
 
-// Validate settings
 func validateSettings(cfg *Config) error {
 	if cfg.StoragePath == "" {
 		return fmt.Errorf("storage_path cannot be empty")
@@ -77,7 +74,6 @@ func validateSettings(cfg *Config) error {
 
 // Set env config if exists
 func applyEnvOverrides(cfg *Config) {
-	// Add logging after parsing port and timeout if values incorrect
 	if env := os.Getenv("URL_SHORTENER_ENV"); env != "" {
 		cfg.Env = env
 	}

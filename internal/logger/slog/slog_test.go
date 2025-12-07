@@ -12,34 +12,35 @@ import (
 )
 
 func TestSlog(t *testing.T) {
-	logger, logContent, cleanup := newProdLogger(t)
+	logger, logReader, cleanup := newProdLogger(t)
 	defer cleanup()
 
-	assert.NotNil(t, logger)
-	logger.Info("test prod message", "key", "value")
+	require.NotNil(t, logger)
 
-	assert.Contains(t, logContent(), `"msg":"test prod message"`)
-	assert.Contains(t, logContent(), `"key":"value"`)
+	logger.Info("test log", "key", "value")
+	logFileContent := logReader()
+
+	assert.Contains(t, logFileContent, `"msg":"test log"`)
+	assert.Contains(t, logFileContent, `"key":"value"`)
+	assert.Contains(t, logFileContent, `"level":"INFO"`)
 }
 
 func TestSlog_With(t *testing.T) {
-	logger, logContent, cleanup := newProdLogger(t)
+	logger, logReader, cleanup := newProdLogger(t)
 	defer cleanup()
 
-	newLogger := logger.With("user_id", "1234")
+	newLogger := logger.With("key", "value")
 	require.NotNil(t, newLogger)
 	require.NotEqual(t, logger, newLogger)
 
-	newLogger.Info("babai")
-	assert.Contains(t, logContent(), `"user_id":"1234"`)
-
 	logger.Info("original")
-	newLogger.Info("with context")
+	newLogger.Info("after with")
 
-	lines := strings.Split(strings.TrimSpace(logContent()), "\n")
+	logFileContent := logReader()
+	logs := strings.Split(strings.TrimSpace(logFileContent), "\n")
 
-	assert.NotContains(t, lines[1], `"user_id"`, "must not contain a new fields")
-	assert.Contains(t, lines[2], `"user_id":"1234"`)
+	assert.NotContains(t, logs[0], `"key":"value"`)
+	assert.Contains(t, logs[1], `"key":"value"`)
 }
 
 func newProdLogger(t *testing.T) (logger logInterface.Logger, readFileFunc func() string, cleanUp func()) {
@@ -53,7 +54,8 @@ func newProdLogger(t *testing.T) (logger logInterface.Logger, readFileFunc func(
 	cfg, err := config.LoadConfig("")
 	require.NoError(t, err)
 
-	logger, logFile, err := NewSlogLogger(cfg)
+	logger, logFile, err := New(cfg)
+	require.NoError(t, err)
 	assert.NotNil(t, logFile)
 
 	return logger,

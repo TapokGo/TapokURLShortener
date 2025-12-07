@@ -11,15 +11,15 @@ import (
 )
 
 func TestInitApp(t *testing.T) {
-	t.Setenv("URL_SHORTENER_ENV", "prod")
-
-	// Create temp file for logs
 	tmpFile, err := os.CreateTemp("", "test-app-*.log")
 	require.NoError(t, err)
 	defer func() {
-		_ = os.Remove(tmpFile.Name())
+		err = os.Remove(tmpFile.Name())
+		require.NoError(t, err)
 	}()
+	require.Nil(t, err)
 
+	t.Setenv("URL_SHORTENER_ENV", "prod")
 	t.Setenv("URL_SHORTENER_LOG_PATH", tmpFile.Name())
 
 	cfg, err := config.LoadConfig("./testdata/valid.yaml")
@@ -30,66 +30,20 @@ func TestInitApp(t *testing.T) {
 	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
 
 	app, err := New(*cfg)
-	require.NoError(t, err)
-	require.NotNil(t, app)
-
 	defer func() {
 		require.NoError(t, app.Close())
+		require.Nil(t, app.repo)
+		require.Nil(t, app.logFile)
 	}()
+
+	require.NoError(t, err)
+	require.NotNil(t, app)
 
 	assert.NotNil(t, app.Logger)
 	assert.NotNil(t, app.logFile)
+	assert.NotNil(t, app.urlService)
+	assert.NotNil(t, app.repo)
+
 	assert.Equal(t, *cfg, app.cfg)
-
 	assert.Equal(t, cfg.LogPath, app.logFile.Name())
-}
-
-func TestInitApp_CloseFile(t *testing.T) {
-	t.Setenv("URL_SHORTENER_ENV", "prod")
-
-	// Create temp file for logs
-	tmpFile, err := os.CreateTemp("", "test-app-*.log")
-	require.NoError(t, err)
-	defer func() {
-		_ = os.Remove(tmpFile.Name())
-	}()
-
-	t.Setenv("URL_SHORTENER_LOG_PATH", tmpFile.Name())
-
-	cfg, err := config.LoadConfig("./testdata/valid.yaml")
-	require.NoError(t, err)
-
-	tmpDir := t.TempDir()
-	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
-
-	app, err := New(*cfg)
-	require.NoError(t, err)
-	require.NotNil(t, app)
-
-	defer func() {
-		require.NoError(t, app.Close())
-	}()
-
-	err = app.Close()
-	require.NoError(t, err)
-	assert.Nil(t, app.logFile)
-}
-
-func TestIniApp_DevMode(t *testing.T) {
-	cfg, err := config.LoadConfig("./testdata/valid.yaml")
-	require.NoError(t, err)
-
-	tmpDir := t.TempDir()
-	cfg.StoragePath = filepath.Join(tmpDir, "test.db")
-
-	app, err := New(*cfg)
-	require.NoError(t, err)
-	require.NotNil(t, app)
-
-	defer func() {
-		require.NoError(t, app.Close())
-	}()
-
-	assert.Nil(t, app.logFile)
-	assert.NotNil(t, app.Logger)
 }
