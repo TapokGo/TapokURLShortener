@@ -35,7 +35,7 @@ func New(path string) (repo.URLStorage, error) {
 		return nil, fmt.Errorf("failed to ping db: %w", err)
 	}
 
-	// Create save and get statements
+	// Create statements
 	saveStmt, getStmt, err := createStmts(db)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create statements: %w", err)
