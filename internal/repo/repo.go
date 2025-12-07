@@ -4,7 +4,10 @@ package repo
 import "errors"
 
 var (
-	ErrNotFound  = errors.New("URL not found")
+	// ErrNotFound returned when url not exist in db
+	ErrNotFound = errors.New("URL not found")
+
+	// ErrDuplicate returned when short URl already exists in db
 	ErrDuplicate = errors.New("URL already exists")
 )
 

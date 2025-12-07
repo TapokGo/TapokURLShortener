@@ -1,3 +1,4 @@
+// Package slog provides slog realization of logger.Logger interface
 package slog
 
 import (
@@ -14,7 +15,7 @@ type slogLogger struct {
 	logger *slog.Logger
 }
 
-// New() creates a new logger.Logger and logs file(in env="prod")
+// New creates a new logger.Logger and logs file(in env="prod")
 func New(cfg *config.Config) (logger.Logger, *os.File, error) {
 	var handler slog.Handler
 	var logFile *os.File

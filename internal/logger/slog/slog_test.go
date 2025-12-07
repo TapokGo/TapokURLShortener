@@ -54,6 +54,7 @@ func newProdLogger(t *testing.T) (logger logInterface.Logger, readFileFunc func(
 	require.NoError(t, err)
 
 	logger, logFile, err := New(cfg)
+	require.NoError(t, err)
 	assert.NotNil(t, logFile)
 
 	return logger,
