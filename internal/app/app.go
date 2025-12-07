@@ -23,8 +23,9 @@ type App struct {
 	repo       repo.URLStorage
 }
 
-// New allows init all dependencies
+// New init all dependencies
 func New(cfg config.Config) (*App, error) {
+	// Logger
 	logger, logFile, err := slog.New(&cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init logger: %w", err)
@@ -50,18 +51,16 @@ func New(cfg config.Config) (*App, error) {
 	}, nil
 }
 
-// Run allows start all program
+// Run start application
 func (a *App) Run() error {
 	a.Logger.Info("Application started", "env", a.cfg.Env)
 
 	fmt.Println(a.cfg)
 
 	return nil
-
-	//TODO: start server
 }
 
-// Close allows close all dependencies.
+// Close close all dependencies
 func (a *App) Close() error {
 	closeErrros := make([]error, 0, 2)
 	// Close logger
