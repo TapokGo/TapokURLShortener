@@ -19,7 +19,7 @@ type urlService struct {
 }
 
 // New create the new URLService
-func New(s repo.URLStorage) service.UserService {
+func New(s repo.URLStorage) service.URLService {
 	return &urlService{
 		repo: s,
 	}
@@ -37,7 +37,7 @@ func (u *urlService) CreateShortURL(originURL string) (string, error) {
 		return "", service.ErrInvalidURL
 	}
 
-	// Try to create shortURL untill we get unique shortURL
+	// Try to create shortURL until we get unique shortURL
 	const maxAttempts = 5
 	for range maxAttempts {
 		shortURL, err := generateAlias(8)
