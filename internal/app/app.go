@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/Tapok-Go/TestURLShortener/internal/config"
-	"github.com/Tapok-Go/TestURLShortener/internal/logger"
-	"github.com/Tapok-Go/TestURLShortener/internal/logger/slog"
-	"github.com/Tapok-Go/TestURLShortener/internal/repo/sqlite"
-	"github.com/Tapok-Go/TestURLShortener/internal/service/url"
+	"github.com/TapokGo/TapokURLShortener/internal/config"
+	"github.com/TapokGo/TapokURLShortener/internal/logger"
+	"github.com/TapokGo/TapokURLShortener/internal/logger/slog"
+	"github.com/TapokGo/TapokURLShortener/internal/repo/sqlite"
+	"github.com/TapokGo/TapokURLShortener/internal/service/url"
 )
 
 // App is a model of application dependencies

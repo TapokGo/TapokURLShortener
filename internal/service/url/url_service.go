@@ -9,8 +9,8 @@ import (
 
 	"net/url"
 
-	"github.com/Tapok-Go/TestURLShortener/internal/repo"
-	"github.com/Tapok-Go/TestURLShortener/internal/service"
+	"github.com/TapokGo/TapokURLShortener/internal/repo"
+	"github.com/TapokGo/TapokURLShortener/internal/service"
 )
 
 // URLService is a model of url-shortener service layer
