@@ -3,8 +3,8 @@ package url
 import (
 	"testing"
 
-	"github.com/Tapok-Go/TestURLShortener/internal/repo"
-	"github.com/Tapok-Go/TestURLShortener/internal/service"
+	"github.com/TapokGo/TapokURLShortener/internal/repo"
+	"github.com/TapokGo/TapokURLShortener/internal/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

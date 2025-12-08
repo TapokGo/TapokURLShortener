@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Tapok-Go/TestURLShortener/internal/config"
-	logInterface "github.com/Tapok-Go/TestURLShortener/internal/logger"
+	"github.com/TapokGo/TapokURLShortener/internal/config"
+	logInterface "github.com/TapokGo/TapokURLShortener/internal/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

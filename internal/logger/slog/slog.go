@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/Tapok-Go/TestURLShortener/internal/config"
-	"github.com/Tapok-Go/TestURLShortener/internal/logger"
+	"github.com/TapokGo/TapokURLShortener/internal/config"
+	"github.com/TapokGo/TapokURLShortener/internal/logger"
 )
 
 type slogLogger struct {

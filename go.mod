@@ -1,4 +1,4 @@
-module github.com/Tapok-Go/TestURLShortener
+module github.com/TapokGo/TapokURLShortener
 
 go 1.25.5
 
