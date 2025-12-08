@@ -5,8 +5,8 @@ import (
 	"flag"
 	"log"
 
-	"github.com/Tapok-Go/TestURLShortener/internal/app"
-	"github.com/Tapok-Go/TestURLShortener/internal/config"
+	"github.com/TapokGo/TapokURLShortener/internal/app"
+	"github.com/TapokGo/TapokURLShortener/internal/config"
 )
 
 func main() {

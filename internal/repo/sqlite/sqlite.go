@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Tapok-Go/TestURLShortener/internal/repo"
+	"github.com/TapokGo/TapokURLShortener/internal/repo"
 	_ "modernc.org/sqlite" // Register sqlite driver
 )
 
