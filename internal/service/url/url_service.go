@@ -1,4 +1,4 @@
-// Package url_service provides utilities for create short URL by origin and get original URL by short
+// Package url provides utilities for create short URL by origin and get original URL by short
 package url
 
 import (
