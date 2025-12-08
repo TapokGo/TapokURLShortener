@@ -4,10 +4,10 @@ package repo
 import "errors"
 
 var (
-	// ErrNotFound returned when url not exist in db
+	// ErrNotFound returned when if short URL not exist in db
 	ErrNotFound = errors.New("URL not found")
 
-	// ErrDuplicate returned when short URl already exists in db
+	// ErrDuplicate returned if short URl already exists in db
 	ErrDuplicate = errors.New("URL already exists")
 )
 
@@ -21,7 +21,7 @@ type URLStorage interface {
 
 	// Get return original URL by short URL
 	// Must return:
-	// - (url, nil) - if record already exists
+	// - (url, nil) - if record exists
 	// - ("", ErrNotFound) - if not found
 	// - ("", err) - idb error
 	Get(short string) (string, error)

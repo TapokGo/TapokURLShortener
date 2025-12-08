@@ -4,12 +4,12 @@ package app
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
 	"github.com/Tapok-Go/TestURLShortener/internal/logger"
 	"github.com/Tapok-Go/TestURLShortener/internal/logger/slog"
-	"github.com/Tapok-Go/TestURLShortener/internal/repo"
 	"github.com/Tapok-Go/TestURLShortener/internal/repo/sqlite"
 	"github.com/Tapok-Go/TestURLShortener/internal/service"
 )
@@ -19,8 +19,7 @@ type App struct {
 	cfg        config.Config
 	Logger     logger.Logger
 	logFile    *os.File
-	urlService *service.URLService
-	repo       repo.URLStorage
+	repoCloser io.Closer
 }
 
 // New init all dependencies
@@ -38,7 +37,7 @@ func New(cfg config.Config) (*App, error) {
 	}
 
 	// Service
-	urlService := service.NewURLService(repo)
+	_ = service.New(repo)
 
 	//TODO: init router - chi, chi-render
 
@@ -46,8 +45,7 @@ func New(cfg config.Config) (*App, error) {
 		cfg:        cfg,
 		Logger:     logger,
 		logFile:    logFile,
-		urlService: urlService,
-		repo:       repo,
+		repoCloser: repo,
 	}, nil
 }
 
@@ -71,10 +69,11 @@ func (a *App) Close() error {
 	}
 
 	// Close repo
-	if a.repo != nil {
-		err := a.repo.Close()
-		a.repo = nil
+	if a.repoCloser != nil {
+		err := a.repoCloser.Close()
+		a.repoCloser = nil
 		closeErrors = append(closeErrors, err)
 	}
+
 	return errors.Join(closeErrors...)
 }
