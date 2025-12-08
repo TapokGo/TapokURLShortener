@@ -22,4 +22,7 @@ type Logger interface {
 	// Return new logger with context(static key-value pair).
 	// Args must be a provided ad key-value pairs
 	With(args ...any) Logger
+
+	// Close closes logs file
+	Close() error
 }
