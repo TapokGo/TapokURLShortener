@@ -28,7 +28,7 @@ type URLService struct {
 	repo repo.URLStorage
 }
 
-// NewURLService create the new URLService
+// New create the new URLService
 func New(s repo.URLStorage) *URLService {
 	return &URLService{
 		repo: s,
