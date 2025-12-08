@@ -37,7 +37,7 @@ func New(cfg config.Config) (*App, error) {
 	}
 
 	// Service
-	_ = service.NewURLService(repo)
+	_ = service.New(repo)
 
 	//TODO: init router - chi, chi-render
 

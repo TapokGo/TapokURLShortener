@@ -29,7 +29,7 @@ type URLService struct {
 }
 
 // NewURLService create the new URLService
-func NewURLService(s repo.URLStorage) *URLService {
+func New(s repo.URLStorage) *URLService {
 	return &URLService{
 		repo: s,
 	}
