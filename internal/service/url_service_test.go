@@ -50,6 +50,18 @@ func TestService_CreateShortURL(t *testing.T) {
 	assert.Len(t, shortURL, 8)
 }
 
+func TestService_CreateShortURL_Validation(t *testing.T) {
+	mockRepo := &mockStorage{}
+	svc := New(mockRepo)
+
+	shortURL, err := svc.CreateShortURL("/test")
+	require.Empty(t, shortURL)
+	require.Error(t, err)
+
+	assert.ErrorIs(t, err, ErrInvalidURL)
+
+}
+
 func TestService_CreateShortURL_WithDuplicate(t *testing.T) {
 	attempt := 0
 	mockRepo := &mockStorage{
