@@ -75,11 +75,11 @@ func TestService_CreateShortURL_WithDuplicate(t *testing.T) {
 	}
 
 	svc := New(mockRepo)
-	shortURl, err := svc.CreateShortURL("https://example.com")
+	shortURL, err := svc.CreateShortURL("https://example.com")
 	require.NoError(t, err)
-	require.NotEmpty(t, shortURl)
+	require.NotEmpty(t, shortURL)
 
-	assert.Len(t, shortURl, 8)
+	assert.Len(t, shortURL, 8)
 	assert.Equal(t, 2, attempt)
 }
 
