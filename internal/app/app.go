@@ -19,7 +19,6 @@ type App struct {
 	cfg        config.Config
 	Logger     logger.Logger
 	logFile    *os.File
-	urlService *service.URLService
 	repoCloser io.Closer
 }
 
@@ -38,7 +37,7 @@ func New(cfg config.Config) (*App, error) {
 	}
 
 	// Service
-	urlService := service.NewURLService(repo)
+	_ = service.NewURLService(repo)
 
 	//TODO: init router - chi, chi-render
 
@@ -46,7 +45,6 @@ func New(cfg config.Config) (*App, error) {
 		cfg:        cfg,
 		Logger:     logger,
 		logFile:    logFile,
-		urlService: urlService,
 		repoCloser: repo,
 	}, nil
 }

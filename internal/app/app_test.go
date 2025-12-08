@@ -42,7 +42,6 @@ func TestInitApp(t *testing.T) {
 
 	assert.NotNil(t, app.Logger)
 	assert.NotNil(t, app.logFile)
-	assert.NotNil(t, app.urlService)
 	assert.NotNil(t, app.repoCloser)
 
 	assert.Equal(t, *cfg, app.cfg)
