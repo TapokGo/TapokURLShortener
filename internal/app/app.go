@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/config"
 	"github.com/Tapok-Go/TestURLShortener/internal/logger"
@@ -18,14 +17,14 @@ import (
 type App struct {
 	cfg        config.Config
 	Logger     logger.Logger
-	logFile    *os.File
+	logCloser  io.Closer
 	repoCloser io.Closer
 }
 
 // New init all dependencies
 func New(cfg config.Config) (*App, error) {
 	// Logger
-	logger, logFile, err := slog.New(&cfg)
+	logger, err := slog.New(&cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init logger: %w", err)
 	}
@@ -44,7 +43,7 @@ func New(cfg config.Config) (*App, error) {
 	return &App{
 		cfg:        cfg,
 		Logger:     logger,
-		logFile:    logFile,
+		logCloser:  logger,
 		repoCloser: repo,
 	}, nil
 }
@@ -62,9 +61,9 @@ func (a *App) Run() error {
 func (a *App) Close() error {
 	closeErrors := make([]error, 0, 2)
 	// Close logger
-	if a.logFile != nil {
-		err := a.logFile.Close()
-		a.logFile = nil
+	if a.logCloser != nil {
+		err := a.logCloser.Close()
+		a.logCloser = nil
 		closeErrors = append(closeErrors, err)
 	}
 

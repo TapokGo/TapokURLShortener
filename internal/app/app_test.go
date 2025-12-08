@@ -34,16 +34,15 @@ func TestInitApp(t *testing.T) {
 	defer func() {
 		require.NoError(t, app.Close())
 		require.Nil(t, app.repoCloser)
-		require.Nil(t, app.logFile)
+		require.Nil(t, app.logCloser)
 	}()
 
 	require.NoError(t, err)
 	require.NotNil(t, app)
 
 	assert.NotNil(t, app.Logger)
-	assert.NotNil(t, app.logFile)
+	assert.NotNil(t, app.logCloser)
 	assert.NotNil(t, app.repoCloser)
 
 	assert.Equal(t, *cfg, app.cfg)
-	assert.Equal(t, cfg.LogPath, app.logFile.Name())
 }

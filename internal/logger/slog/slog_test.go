@@ -54,19 +54,19 @@ func newProdLogger(t *testing.T) (logger logInterface.Logger, readFileFunc func(
 	cfg, err := config.LoadConfig("")
 	require.NoError(t, err)
 
-	logger, logFile, err := New(cfg)
+	logger, err = New(cfg)
 	require.NoError(t, err)
-	assert.NotNil(t, logFile)
+	assert.NotNil(t, logger)
 
 	return logger,
 		func() string {
-			logContent, err := os.ReadFile(logFile.Name())
+			logContent, err := os.ReadFile(tmpFile.Name())
 			require.NoError(t, err)
 			return string(logContent)
 		},
 		func() {
-			if logFile != nil {
-				_ = logFile.Close()
+			if logger != nil {
+				_ = logger.Close()
 				_ = os.Remove(tmpFile.Name())
 			}
 		}

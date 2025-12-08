@@ -11,12 +11,13 @@ import (
 )
 
 type slogLogger struct {
-	cfg    *config.Config
-	logger *slog.Logger
+	cfg     *config.Config
+	logger  *slog.Logger
+	logFile *os.File
 }
 
 // New creates a new logger.Logger and logs file(in env="prod")
-func New(cfg *config.Config) (logger.Logger, *os.File, error) {
+func New(cfg *config.Config) (logger.Logger, error) {
 	var handler slog.Handler
 	var logFile *os.File
 
@@ -26,10 +27,11 @@ func New(cfg *config.Config) (logger.Logger, *os.File, error) {
 		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelDebug,
 		})
+		logFile = nil
 	} else {
 		file, err := os.OpenFile(cfg.LogPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to open log file: %w", err)
+			return nil, fmt.Errorf("failed to open log file: %w", err)
 		}
 		logFile = file
 
@@ -39,11 +41,12 @@ func New(cfg *config.Config) (logger.Logger, *os.File, error) {
 	}
 
 	sl := &slogLogger{
-		cfg:    cfg,
-		logger: slog.New(handler),
+		cfg:     cfg,
+		logger:  slog.New(handler),
+		logFile: logFile,
 	}
 
-	return sl, logFile, nil
+	return sl, nil
 }
 
 // Info logs a message at Info level
@@ -72,4 +75,16 @@ func (s *slogLogger) With(args ...any) logger.Logger {
 		logger: s.logger.With(args...),
 		cfg:    s.cfg,
 	}
+}
+
+func (s *slogLogger) Close() error {
+	if s.logFile != nil {
+		err := s.logFile.Close()
+		s.logFile = nil
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
