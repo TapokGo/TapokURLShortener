@@ -1,9 +1,10 @@
-package service
+package url_service
 
 import (
 	"testing"
 
 	"github.com/Tapok-Go/TestURLShortener/internal/repo"
+	"github.com/Tapok-Go/TestURLShortener/internal/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -58,7 +59,7 @@ func TestService_CreateShortURL_Validation(t *testing.T) {
 	require.Empty(t, shortURL)
 	require.Error(t, err)
 
-	assert.ErrorIs(t, err, ErrInvalidURL)
+	assert.ErrorIs(t, err, service.ErrInvalidURL)
 
 }
 
@@ -98,7 +99,7 @@ func TestService_CreateShortURL_MaxAttemptExceeded(t *testing.T) {
 	require.Empty(t, shortURL)
 
 	assert.Equal(t, 5, attempt)
-	assert.ErrorIs(t, err, ErrAliasGenFailed)
+	assert.ErrorIs(t, err, service.ErrAliasGenFailed)
 }
 
 func TestService_ResolveShortURL(t *testing.T) {
@@ -128,5 +129,5 @@ func TestService_ResolveShortURL_NotFound(t *testing.T) {
 	require.Error(t, err)
 	require.Empty(t, originURL)
 
-	assert.ErrorIs(t, err, ErrNotFound)
+	assert.ErrorIs(t, err, service.ErrNotFound)
 }

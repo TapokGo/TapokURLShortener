@@ -11,7 +11,7 @@ import (
 	"github.com/Tapok-Go/TestURLShortener/internal/logger"
 	"github.com/Tapok-Go/TestURLShortener/internal/logger/slog"
 	"github.com/Tapok-Go/TestURLShortener/internal/repo/sqlite"
-	"github.com/Tapok-Go/TestURLShortener/internal/service"
+	"github.com/Tapok-Go/TestURLShortener/internal/service/url_service"
 )
 
 // App is a model of application dependencies
@@ -37,7 +37,7 @@ func New(cfg config.Config) (*App, error) {
 	}
 
 	// Service
-	_ = service.New(repo)
+	_ = url_service.New(repo)
 
 	//TODO: init router - chi, chi-render
 
