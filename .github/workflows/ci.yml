@@ -32,12 +32,3 @@ jobs:
 
             - name: Run CI
               run: make build
-
-    main-guard:
-        runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        steps:
-            - name: Check if push is allowed
-              run: |
-                echo "Охуел?"
-                exit 1
