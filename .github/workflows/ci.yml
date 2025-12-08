@@ -2,7 +2,7 @@ name: CI
 
 on:
     push:
-        branches: [**]
+        branches: ['**']
     pull_request:
         branches: ['main']
 
@@ -10,12 +10,17 @@ jobs:
     ci:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: Set up Go
-              uses: actions/setup-go@v4
+              uses: actions/setup-go@v6
               with:
                 go-version-file: 'go.mod'
+
+            - name: Set up golangci-lint
+              uses: golangci/golangci-lint-action@v9
+              with:
+                version: v2.6
 
             - name: Cache Go modules
               uses: actions/cache@v4
