@@ -1,5 +1,5 @@
 // Package url_service provides utilities for create short URL by origin and get original URL by short
-package url_service
+package url
 
 import (
 	"crypto/rand"
