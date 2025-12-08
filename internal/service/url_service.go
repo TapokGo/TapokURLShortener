@@ -38,8 +38,12 @@ func New(s repo.URLStorage) *URLService {
 // CreateShortURL create short URL by origin URL
 func (u *URLService) CreateShortURL(originURL string) (string, error) {
 	// Validate URL
-	_, err := url.Parse(originURL)
+	url, err := url.ParseRequestURI(originURL)
 	if err != nil {
+		return "", ErrInvalidURL
+	}
+
+	if url.Host == "" {
 		return "", ErrInvalidURL
 	}
 
