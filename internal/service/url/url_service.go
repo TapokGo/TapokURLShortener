@@ -37,7 +37,7 @@ func (u *urlService) CreateShortURL(originURL string) (string, error) {
 		return "", service.ErrInvalidURL
 	}
 
-	if url.Scheme != "http" || url.Scheme != "https" {
+	if url.Scheme != "http" && url.Scheme != "https" {
 		return "", service.ErrInvalidURL
 	}
 
