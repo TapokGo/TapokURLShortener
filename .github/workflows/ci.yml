@@ -20,6 +20,7 @@ jobs:
               uses: golangci/golangci-lint-action@v9
               with:
                 version: v2.6
+                cache: true
 
             - name: Run lint
               run: make lint
