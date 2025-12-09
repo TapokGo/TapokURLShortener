@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/TapokGo/TapokURLShortener/internal/handler/v1/dto"
 	"github.com/TapokGo/TapokURLShortener/internal/handler/v1/httperror"
@@ -33,16 +34,19 @@ func New(urlService service.URLService, logger logger.Logger, baseURL string) *U
 func (h *URLHandler) Register(r chi.Router) {
 	r.Post("/shorten", h.CreateShortURL)
 	r.Get("/{code}", h.Redirect)
+	r.Use(middleware.Recoverer)
 }
 
 // CreateShortURL creates short URL by base URL
 func (h *URLHandler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
-	// Parse requestb body
+	// Parse request body
 	var req dto.CreateShortURL
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, httperror.InvalidRequest("invalid request"))
+		h.logger.Error("failed to decode request", "error", err)
 		return
 	}
+	defer r.Body.Close()
 
 	// Create short URL
 	code, err := h.urlService.CreateShortURL(req.URL)
@@ -54,27 +58,31 @@ func (h *URLHandler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
 
 		if err == service.ErrAliasGenFailed {
 			writeError(w, httperror.InternalServerError("attempt over"))
+			h.logger.Error("failed to create short URL", "error", err)
 			return
 		}
 
 		writeError(w, httperror.InternalServerError("failed to create short URL"))
+		h.logger.Error("failed to create short URL", "error", err)
+
 	}
 
-	// Create reponse
+	// Create response
 	response := dto.ShortURLResponse{
 		ShortURL: h.baseURL + "/" + code,
 	}
 
-	// Send reponse
+	// Send response
 	writeJSON(w, http.StatusCreated, response)
 }
 
 // Redirect redirects on base URL by short
 func (h *URLHandler) Redirect(w http.ResponseWriter, r *http.Request) {
-	// Get code from parametr
+	// Get code from parameter
 	code := chi.URLParam(r, "code")
 	if code == "" {
 		writeError(w, httperror.InvalidRequest("invalid URL parameter"))
+		h.logger.Error("failed response", "error", "no code into URL parametrs")
 		return
 	}
 
@@ -87,6 +95,7 @@ func (h *URLHandler) Redirect(w http.ResponseWriter, r *http.Request) {
 		}
 
 		writeError(w, httperror.InternalServerError("failed to get original URL"))
+		h.logger.Error("failed to get base URL", "error", err)
 		return
 	}
 

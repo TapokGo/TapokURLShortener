@@ -37,6 +37,10 @@ func (u *urlService) CreateShortURL(originURL string) (string, error) {
 		return "", service.ErrInvalidURL
 	}
 
+	if url.Scheme != "http" || url.Scheme != "https" {
+		return "", service.ErrInvalidURL
+	}
+
 	// Try to create shortURL until we get unique shortURL
 	const maxAttempts = 5
 	for range maxAttempts {
