@@ -2,8 +2,10 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"log"
+	"net/http"
 
 	"github.com/TapokGo/TapokURLShortener/internal/app"
 	"github.com/TapokGo/TapokURLShortener/internal/config"
@@ -34,7 +36,7 @@ func main() {
 	}()
 
 	// Start app
-	if err := app.Run(); err != nil {
+	if err := app.Run(); err != nil && !errors.Is(err, http.ErrServerClosed){
 		app.Logger.Error("application failed", "error", err)
 	}
 }
