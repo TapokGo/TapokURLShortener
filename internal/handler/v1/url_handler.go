@@ -32,9 +32,9 @@ func New(urlService service.URLService, logger logger.Logger, baseURL string) *U
 
 // Register registers routes
 func (h *URLHandler) Register(r chi.Router) {
+	r.Use(middleware.Recoverer)
 	r.Post("/shorten", h.CreateShortURL)
 	r.Get("/{code}", h.Redirect)
-	r.Use(middleware.Recoverer)
 }
 
 // CreateShortURL creates short URL by base URL
