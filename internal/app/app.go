@@ -5,12 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
+	"strconv"
 
 	"github.com/TapokGo/TapokURLShortener/internal/config"
+	v1 "github.com/TapokGo/TapokURLShortener/internal/handler/v1"
 	"github.com/TapokGo/TapokURLShortener/internal/logger"
 	"github.com/TapokGo/TapokURLShortener/internal/logger/slog"
 	"github.com/TapokGo/TapokURLShortener/internal/repo/sqlite"
 	"github.com/TapokGo/TapokURLShortener/internal/service/url"
+	"github.com/go-chi/chi/v5"
 )
 
 // App is a model of application dependencies
@@ -19,6 +23,7 @@ type App struct {
 	Logger     logger.Logger
 	logCloser  io.Closer
 	repoCloser io.Closer
+	router     http.Handler
 }
 
 // New init all dependencies
@@ -36,25 +41,29 @@ func New(cfg config.Config) (*App, error) {
 	}
 
 	// Service
-	_ = url.New(repo)
+	service := url.New(repo)
 
-	//TODO: init router - chi, chi-render
+	// Router + handler
+	baseURL := cfg.HTTPServer.Address + ":" + strconv.Itoa(cfg.HTTPServer.Port)
+	handler := v1.New(service, logger, baseURL)
+	r := chi.NewRouter()
+	handler.Register(r)
 
 	return &App{
 		cfg:        cfg,
 		Logger:     logger,
 		logCloser:  logger,
 		repoCloser: repo,
+		router:     r,
 	}, nil
 }
 
 // Run start application
 func (a *App) Run() error {
-	a.Logger.Info("Application started", "env", a.cfg.Env)
+	addr := a.cfg.HTTPServer.Address + ":" + strconv.Itoa(a.cfg.HTTPServer.Port)
+	a.Logger.Info("Application started", "address", addr)
 
-	fmt.Println(a.cfg)
-
-	return nil
+	return http.ListenAndServe(addr, a.router)
 }
 
 // Close close all dependencies

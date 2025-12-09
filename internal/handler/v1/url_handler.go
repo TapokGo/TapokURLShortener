@@ -46,10 +46,6 @@ func (h *URLHandler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
 		h.logger.Error("failed to decode request", "error", err)
 		return
 	}
-	defer func() {
-		err := r.Body.Close()
-		h.logger.Error("failed to close body", "error", err)
-	}()
 
 	// Create short URL
 	code, err := h.urlService.CreateShortURL(req.URL)
