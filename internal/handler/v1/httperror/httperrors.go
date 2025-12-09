@@ -1,3 +1,4 @@
+// Package httperror provides HTTPError struct methods for returning errors
 package httperror
 
 import (
