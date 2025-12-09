@@ -46,7 +46,10 @@ func (h *URLHandler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
 		h.logger.Error("failed to decode request", "error", err)
 		return
 	}
-	defer r.Body.Close()
+	defer func() {
+		err := r.Body.Close()
+		h.logger.Error("failed to close body", "error", err)
+	}()
 
 	// Create short URL
 	code, err := h.urlService.CreateShortURL(req.URL)
@@ -106,11 +109,11 @@ func (h *URLHandler) Redirect(w http.ResponseWriter, r *http.Request) {
 func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(v)
+	_ = json.NewEncoder(w).Encode(v)
 }
 
 func writeError(w http.ResponseWriter, err httperror.HTTPError) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(err.Code)
-	json.NewEncoder(w).Encode(err)
+	_ = json.NewEncoder(w).Encode(err)
 }
