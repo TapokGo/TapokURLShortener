@@ -17,13 +17,13 @@ import (
 )
 
 type mockService struct {
-	CreatShortURlFunc   func(originalURL string) (string, error)
+	CreateShortURLFunc   func(originalURL string) (string, error)
 	ResolveShortURLFunc func(shortURL string) (string, error)
 }
 
 func (m *mockService) CreateShortURL(originalURL string) (string, error) {
-	if m.CreatShortURlFunc != nil {
-		return m.CreatShortURlFunc(originalURL)
+	if m.CreateShortURLFunc != nil {
+		return m.CreateShortURLFunc(originalURL)
 	}
 	return "", nil
 }
@@ -48,10 +48,9 @@ func (d dummyLogger) Close() error {
 	return nil
 }
 
-
 func TestCreateShortURL_Success(t *testing.T) {
 	mockSvc := &mockService{
-		CreatShortURlFunc: func(originalURL string) (string, error) {
+		CreateShortURLFunc: func(originalURL string) (string, error) {
 			return "abc123", nil
 		},
 	}
@@ -91,7 +90,7 @@ func TestCreateShortURL_InvalidJSON(t *testing.T) {
 
 func TestCreateShortURL_EmptyURL(t *testing.T) {
 	mockSvc := &mockService{
-		CreatShortURlFunc: func(originalURL string) (string, error) {
+		CreateShortURLFunc: func(originalURL string) (string, error) {
 			return "", service.ErrInvalidURL
 		},
 	}
@@ -112,7 +111,7 @@ func TestCreateShortURL_EmptyURL(t *testing.T) {
 
 func TestCreateShortURL_AliasGenFailed(t *testing.T) {
 	mockSvc := &mockService{
-		CreatShortURlFunc: func(originalURL string) (string, error) {
+		CreateShortURLFunc: func(originalURL string) (string, error) {
 			return "", service.ErrAliasGenFailed
 		},
 	}

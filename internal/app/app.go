@@ -61,9 +61,18 @@ func New(cfg config.Config) (*App, error) {
 // Run start application
 func (a *App) Run() error {
 	addr := a.cfg.HTTPServer.Address + ":" + strconv.Itoa(a.cfg.HTTPServer.Port)
+
+	server := &http.Server{
+		Addr: addr,
+		Handler: a.router,
+		ReadTimeout: a.cfg.HTTPServer.Timeout,
+		WriteTimeout: a.cfg.HTTPServer.Timeout,
+		IdleTimeout: a.cfg.HTTPServer.IdleTimeout,
+	}
+
 	a.Logger.Info("Application started", "address", addr)
 
-	return http.ListenAndServe(addr, a.router)
+	return server.ListenAndServe()
 }
 
 // Close close all dependencies
