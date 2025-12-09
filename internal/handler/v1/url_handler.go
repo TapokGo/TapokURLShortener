@@ -7,13 +7,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/TapokGo/TapokURLShortener/internal/dto"
+	"github.com/TapokGo/TapokURLShortener/internal/handler/v1/dto"
 	"github.com/TapokGo/TapokURLShortener/internal/handler/v1/httperror"
 	"github.com/TapokGo/TapokURLShortener/internal/logger"
 	"github.com/TapokGo/TapokURLShortener/internal/service"
 )
-
-// TODO: add logging
 
 // URLHandler is a model of the handler layer
 type URLHandler struct {
@@ -31,18 +29,22 @@ func New(urlService service.URLService, logger logger.Logger, baseURL string) *U
 	}
 }
 
+// Register registers routes
 func (h *URLHandler) Register(r chi.Router) {
 	r.Post("/shorten", h.CreateShortURL)
 	r.Get("/{code}", h.Redirect)
 }
 
+// CreateShortURL creates short URL by base URL
 func (h *URLHandler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
+	// Parse requestb body
 	var req dto.CreateShortURL
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, httperror.InvalidRequest("invalid request"))
 		return
 	}
 
+	// Create short URL
 	code, err := h.urlService.CreateShortURL(req.URL)
 	if err != nil {
 		if err == service.ErrInvalidURL {
@@ -58,20 +60,25 @@ func (h *URLHandler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
 		writeError(w, httperror.InternalServerError("failed to create short URL"))
 	}
 
+	// Create reponse
 	response := dto.ShortURLResponse{
 		ShortURL: h.baseURL + "/" + code,
 	}
 
+	// Send reponse
 	writeJSON(w, http.StatusCreated, response)
 }
 
+// Redirect redirects on base URL by short
 func (h *URLHandler) Redirect(w http.ResponseWriter, r *http.Request) {
+	// Get code from parametr
 	code := chi.URLParam(r, "code")
 	if code == "" {
 		writeError(w, httperror.InvalidRequest("invalid URL parameter"))
 		return
 	}
 
+	// Get base URL
 	originalURL, err := h.urlService.ResolveShortURL(code)
 	if err != nil {
 		if err == service.ErrNotFound {
@@ -83,6 +90,7 @@ func (h *URLHandler) Redirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Redirect user
 	http.Redirect(w, r, originalURL, http.StatusFound)
 }
 
